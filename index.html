@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Kalkulator Godzin</title>
+		<style>
+			table {
+				border-collapse: collapse;
+			}
+
+			th,
+			td {
+				border: 1px solid black;
+				padding: 8px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<h1>Kalkulator</h1>
+
+		<table>
+			<tr>
+				<td><label for="startInput">Godzina</label></td>
+				<td><label for="roundingTarget">Zaokrąglenie</label></td>
+				<td><label for="resultsAmount">Liczba wyników</label></td>
+			</tr>
+			<tr>
+				<td><input type="time" id="startInput" value="08:00" /></td>
+				<td><input type="number" id="roundingTarget" value="30" min="1" max="60" /></td>
+				<td><input type="number" id="resultsAmount" value="17" min="1" max="50" /></td>
+			</tr>
+		</table>
+		<hr />
+		<table>
+			<thead>
+				<tr>
+					<th>Godzina wyjścia</th>
+					<th>Czas pracy</th>
+				</tr>
+			</thead>
+			<tbody id="tableBody"></tbody>
+		</table>
+
+		<script>
+			// Pobieranie referencji do elementów HTML
+			var startInput = document.getElementById("startInput");
+			var roundingTarget = document.getElementById("roundingTarget");
+			var resultsAmount = document.getElementById("resultsAmount");
+			var tableBody = document.getElementById("tableBody");
+
+			// Obsługa zmiany wartości w polu start
+			startInput.addEventListener("input", generateTable);
+			roundingTarget.addEventListener("input", generateTable);
+			resultsAmount.addEventListener("input", generateTable);
+
+			// Generowanie tabeli
+			function generateTable() {
+				var startTimeString = startInput.value;
+				var startTimeParts = startTimeString.split(":");
+				var start = new Date(0, 0, 0, parseInt(startTimeParts[0]), parseInt(startTimeParts[1]), 0, 0);
+
+				// Czyszczenie zawartości tabeli
+				tableBody.innerHTML = "";
+
+				// Generowanie wierszy
+				var loopTimes = parseInt(resultsAmount.value) + 1;
+				var roundingTargetValue = parseInt(roundingTarget.value);
+				for (var i = 1; i < loopTimes; i++) {
+					var row = document.createElement("tr");
+
+					var leaveHour = new Date(start.getTime() + (((i * 2 - 1) * roundingTargetValue) / 2 + 1) * 60 * 1000);
+
+					var diffMs = leaveHour.getTime() - start.getTime();
+					var workHoursMinutes = Math.ceil(diffMs / 1000 / 60 / roundingTargetValue) * roundingTargetValue;
+
+					var workHours = new Date(0, 0, 0, 0, workHoursMinutes, 0, 0);
+
+					// Obsługa przekroczenia 24 godzin
+					if (workHours.getMinutes() >= 60) {
+						workHours.setHours(workHours.getHours() + Math.floor(workHours.getMinutes() / 60));
+						workHours.setMinutes(workHours.getMinutes() % 60);
+					}
+
+					var leaveHourCell = document.createElement("td");
+					leaveHourCell.textContent = formatTime(leaveHour);
+					row.appendChild(leaveHourCell);
+
+					var workHoursCell = document.createElement("td");
+					workHoursCell.textContent = formatTime(workHours);
+					row.appendChild(workHoursCell);
+
+					tableBody.appendChild(row);
+				}
+			}
+
+			// Formatowanie czasu jako "hh:mm"
+			function formatTime(date) {
+				var hours = date.getHours().toString().padStart(2, "0");
+				var minutes = date.getMinutes().toString().padStart(2, "0");
+				return hours + ":" + minutes;
+			}
+
+			// Inicjalizacja generowania tabeli przy załadowaniu strony
+			generateTable();
+		</script>
+	</body>
+</html>
