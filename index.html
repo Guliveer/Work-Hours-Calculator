@@ -26,7 +26,16 @@
 			</tr>
 			<tr>
 				<td><input type="time" id="startInput" value="08:00" /></td>
-				<td><input type="number" id="roundingTarget" value="30" min="1" max="60" /></td>
+				<td>
+					<select id="roundingTarget">
+						<option value="60">60 minut</option>
+						<option value="30" selected>30 minut</option>
+						<option value="20">20 minut</option>
+						<option value="15">15 minut</option>
+						<option value="10">10 minut</option>
+						<option value="5">5 minut</option>
+					</select>
+				</td>
 				<td><input type="number" id="resultsAmount" value="17" min="1" max="50" /></td>
 			</tr>
 		</table>
@@ -52,6 +61,52 @@
 			startInput.addEventListener("input", generateTable);
 			roundingTarget.addEventListener("input", generateTable);
 			resultsAmount.addEventListener("input", generateTable);
+
+			// Zapisanie zmiennych do pamięci przeglądarki oraz daty ostatniej ich edycji
+			startInput.addEventListener("input", function () {
+				localStorage.setItem("startInput", startInput.value);
+				localStorage.setItem("startInput_lastSave", new Date().getTime());
+			});
+
+			roundingTarget.addEventListener("input", function () {
+				localStorage.setItem("roundingTarget", roundingTarget.value);
+				localStorage.setItem("roundingTarget_lastSave", new Date().getTime());
+			});
+
+			resultsAmount.addEventListener("input", function () {
+				localStorage.setItem("resultsAmount", resultsAmount.value);
+				localStorage.setItem("resultsAmount_lastSave", new Date().getTime());
+			});
+
+			// Jeśli data ostatniego zapisu jest wczoraj lub wcześniej, wyczyść te dane
+			if (localStorage.getItem("startInput_lastSave")) {
+				var startInput_lastSave = new Date(parseInt(localStorage.getItem("startInput_lastSave")));
+				var roundingTarget_lastSave = new Date(parseInt(localStorage.getItem("roundingTarget_lastSave")));
+				var resultsAmount_lastSave = new Date(parseInt(localStorage.getItem("resultsAmount_lastSave")));
+
+				var today = new Date();
+				if (startInput_lastSave.getDate() < today.getDate() || roundingTarget_lastSave.getDate() < today.getDate() || resultsAmount_lastSave.getDate() < today.getDate()) {
+					localStorage.removeItem("startInput");
+					localStorage.removeItem("startInput_lastSave");
+
+					localStorage.removeItem("roundingTarget");
+					localStorage.removeItem("roundingTarget_lastSave");
+
+					localStorage.removeItem("resultsAmount");
+					localStorage.removeItem("resultsAmount_lastSave");
+				}
+			}
+
+			// Wpisanie zmiennych z localStorage, jeśli istnieją
+			if (localStorage.getItem("startInput")) {
+				startInput.value = localStorage.getItem("startInput");
+			}
+			if (localStorage.getItem("roundingTarget")) {
+				roundingTarget.value = localStorage.getItem("roundingTarget");
+			}
+			if (localStorage.getItem("resultsAmount")) {
+				resultsAmount.value = localStorage.getItem("resultsAmount");
+			}
 
 			// Generowanie tabeli
 			function generateTable() {
