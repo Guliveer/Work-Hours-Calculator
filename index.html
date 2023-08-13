@@ -85,15 +85,9 @@
 				var resultsAmount_lastSave = new Date(parseInt(localStorage.getItem("resultsAmount_lastSave")));
 
 				var today = new Date();
-				if (startInput_lastSave.getDate() < today.getDate() || roundingTarget_lastSave.getDate() < today.getDate() || resultsAmount_lastSave.getDate() < today.getDate()) {
+				if (startInput_lastSave.getDate() < today.getDate()) {
 					localStorage.removeItem("startInput");
 					localStorage.removeItem("startInput_lastSave");
-
-					localStorage.removeItem("roundingTarget");
-					localStorage.removeItem("roundingTarget_lastSave");
-
-					localStorage.removeItem("resultsAmount");
-					localStorage.removeItem("resultsAmount_lastSave");
 				}
 			}
 
